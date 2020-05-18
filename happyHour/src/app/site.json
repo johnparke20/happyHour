@@ -1,0 +1,12 @@
+{
+  "name": "index",
+  "selector": null,
+  "baseUrl": "http://www.gcfb.net/location/troy",
+  "children": [
+    {
+      "name": "menu",
+      "selector": ".element",
+      "children": []
+    }
+  ]
+}
