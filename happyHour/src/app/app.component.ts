@@ -4,8 +4,9 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { throwError} from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {results,results2,results3} from './results';
-import {resultSites} from './resultSites'
-import {Crawler} from './crawler';
+import {resultSites} from './resultSites';
+import {menus} from './menus'
+import { DomSanitizer } from '@angular/platform-browser';
 
 
 @Component({
@@ -20,8 +21,23 @@ export class AppComponent {
   res=results['results'];
   resSites=resultSites;
   pages=[];
-
-  constructor(private http: HttpClient) { }
+  menu=menus;
+  menuPDFs=[];
+  safeURL;
+  
+  constructor(private http: HttpClient,private sanitizer: DomSanitizer) { 
+    this.safeURL=sanitizer.bypassSecurityTrustResourceUrl('https://www.texasroadhouse.com/texas-roadhouse-master-menu.pdf');
+    for(var i=0;i<this.menu.length;i+=1){
+      var temp=[];
+      for(var j =0;j<this.menu[i][1].length;j+=1){
+        if(this.menu[i][1][j].substr(this.menu[i][1][j].length-4,4)=='.pdf'){
+          temp.push(sanitizer.bypassSecurityTrustResourceUrl('https://cors-anywhere.herokuapp.com/'+this.menu[i][1][j]));
+        }
+      }
+      this.menuPDFs.push(temp);
+    }
+    console.log(this.menuPDFs);
+  }
 
   public search(){
     var location = "42.612495,-83.079359";
@@ -35,6 +51,7 @@ export class AppComponent {
     //     this.res=response['results']
     //   });
 
+
     // var place = "";
     // for(var i = 0;i<this.res.length;i++){
     //     place=this.res[i]['place_id']
@@ -46,29 +63,16 @@ export class AppComponent {
     //       console.log(response['result']['website'] as (JSON));
     //     });
     // }
-    
-
   }
 
+
   public displayResults(){
+    this.pages=[];
     for(var i = 0;i<20;i++){
-      this.pages.push([this.res[i]['name'],this.resSites[i]]);
+      this.pages.push([this.res[i]['name'],this.resSites[i],this.menuPDFs[i][0]]);
     }
-    var info = {
-      "name": "index",
-      "selector": null,
-      "baseUrl": "http://www.gcfb.net/location/troy",
-      "children": [
-        {
-          "name": "menu",
-          "selector": ".element",
-          "children": []
-        }
-      ]
-    }
-    var crawler = new Crawler('http://www.gcfb.net/location/troy-michigan')
-    crawler.crawlInternal("","",[],"./grabs")
-    // console.log(this.res);
+    // const searchUrl = 'https://cors-anywhere.herokuapp.com/'+this.resSites[0];
+    
   }
 
   private handleError(error: HttpErrorResponse) {
