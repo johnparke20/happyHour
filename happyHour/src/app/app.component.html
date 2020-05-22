@@ -354,7 +354,7 @@
 
   </div>
 
-  <div style='text-align: center;' *ngFor="let hero of pages"><h3 >{{hero[0]}}</h3><a href={{hero[1]}}>{{hero[1]}}</a><br><iframe [src]="safeURL" title={{hero[2]}}></iframe></div>
+  <div style='text-align: center;' *ngFor="let hero of pages;let i = index"><h3 >{{hero[0]}}</h3><a href={{hero[1]}}>{{hero[1]}}</a><br><iframe width='700px' height='300px' [src]='safeURL[i+1][0]' [title]='safeURL[0]'></iframe></div>
 
 </div>
 

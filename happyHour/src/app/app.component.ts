@@ -6,7 +6,7 @@ import { catchError } from 'rxjs/operators';
 import {results,results2,results3} from './results';
 import {resultSites} from './resultSites';
 import {menus} from './menus'
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 
 @Component({
@@ -22,21 +22,22 @@ export class AppComponent {
   resSites=resultSites;
   pages=[];
   menu=menus;
-  menuPDFs=[];
   safeURL;
   
   constructor(private http: HttpClient,private sanitizer: DomSanitizer) { 
-    this.safeURL=sanitizer.bypassSecurityTrustResourceUrl('https://www.texasroadhouse.com/texas-roadhouse-master-menu.pdf');
+    this.safeURL=[[sanitizer.bypassSecurityTrustResourceUrl('https://www.konagrill.com/download_file/view_inline/691')]];
     for(var i=0;i<this.menu.length;i+=1){
       var temp=[];
       for(var j =0;j<this.menu[i][1].length;j+=1){
         if(this.menu[i][1][j].substr(this.menu[i][1][j].length-4,4)=='.pdf'){
-          temp.push(sanitizer.bypassSecurityTrustResourceUrl('https://cors-anywhere.herokuapp.com/'+this.menu[i][1][j]));
+          temp.push(sanitizer.bypassSecurityTrustResourceUrl(this.menu[i][1][j]));
         }
       }
-      this.menuPDFs.push(temp);
+      if(temp.length==0){
+        temp.push(this.safeURL[0][0]);
+      }
+      this.safeURL.push(temp);
     }
-    console.log(this.menuPDFs);
   }
 
   public search(){
@@ -69,9 +70,9 @@ export class AppComponent {
   public displayResults(){
     this.pages=[];
     for(var i = 0;i<20;i++){
-      this.pages.push([this.res[i]['name'],this.resSites[i],this.menuPDFs[i][0]]);
+      this.pages.push([this.res[i]['name'],this.resSites[i]]);
+      console.log(this.safeURL[i]);
     }
-    // const searchUrl = 'https://cors-anywhere.herokuapp.com/'+this.resSites[0];
     
   }
 
